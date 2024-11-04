@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 from tinydb import TinyDB, Query
 import random
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 parameters = {
     'rule_type': ['crossing_giveway', 'crossing_standon', 'headon_giveway', 'overtaking_giveway', 'overtaking_standon'],
@@ -193,6 +195,6 @@ def upload_file():
 def hello_world():
     return "Hello, World!"
 
-
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8800)
+#
+# if __name__ == '__main__':
+#     app.run(host='127.0.0.1', port=8800)
