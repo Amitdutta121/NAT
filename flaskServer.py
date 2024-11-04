@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from tinydb import TinyDB, Query
 import random
+import os
 
 app = Flask(__name__)
 
@@ -10,6 +11,8 @@ parameters = {
     'cpa_time': ['critical', 'near', 'safe'],
     'tss': ['high', 'medium', 'low']
 }
+
+UPLOAD_FOLDER = "uploads"
 db = TinyDB('mydatabase.json')
 
 # Define the query
@@ -167,10 +170,29 @@ def update_weakness_by_student():
         })
 
 
+@app.route("/upload", methods=['POST'])
+def upload_file():
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected for uploading'}), 400
+    if file:
+        # Securely save the file to the server
+        filename = file.filename
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+
+        return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
+
+    return jsonify({'error': 'File upload failed'}), 500
+
 @app.route("/")
 def hello_world():
     return "Hello, World!"
 
 
-# if __name__ == '__main__':
-#     app.run(host='127.0.0.1', port=8800)
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=8800)
