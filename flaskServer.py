@@ -172,10 +172,10 @@ def update_weakness_by_student():
         })
 
 
-@app.route("/upload", methods=['POST'])
-def upload_file():
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
+@app.route("/upload/<string:upload_folder>", methods=['POST'])
+def upload_file(upload_folder):
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400
     file = request.files['file']
@@ -184,7 +184,7 @@ def upload_file():
     if file:
         # Securely save the file to the server
         filename = file.filename
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        filepath = os.path.join(upload_folder, filename)
         file.save(filepath)
 
         return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
