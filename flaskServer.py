@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask, request, jsonify
 from tinydb import TinyDB, Query
 import random
@@ -109,15 +111,23 @@ def updated_wheel_parameter(previous_params, new_score_in, parameter_options, we
 
 @app.route("/students/initialize/<string:student_id>", methods=['GET'])
 def initialize_student(student_id):
+    values, parameter_options = initialize_values(parameters)
     if not student_exists(student_id):
-        values, parameter_options = initialize_values(parameters)
         insert_student_data(student_id, values, parameter_options)
         return jsonify({
             'message': "Student initialized"
         })
     else:
+        # Reinitialize existing student while keeping the existing 'answers'
+        student_data = get_weakness_by_student_name(student_id)
+        updated_data = {
+            'weakness': values,
+            'actual_parameters': parameter_options,
+            'answers': student_data['answers']  # Retain the existing answers
+        }
+        update_student_by_name(student_id, updated_data)
         return jsonify({
-            'message': "Student already exists"
+            'message': "Student data reinitialized while retaining answers"
         })
 
 
@@ -160,7 +170,8 @@ def update_weakness_by_student():
         print(student_data)
         student_data['answers'].append({
             'question_params': previous_question_param,
-            'score': score
+            'score': score,
+            'timestamp': datetime.now()
         })
         update_student_by_name(student_id, student_data)
         return jsonify({
