@@ -171,7 +171,7 @@ def update_weakness_by_student():
         student_data['answers'].append({
             'question_params': previous_question_param,
             'score': score,
-            'timestamp': datetime.now()
+            'timestamp': datetime.now().isoformat()
         })
         update_student_by_name(student_id, student_data)
         return jsonify({
@@ -207,5 +207,5 @@ def hello_world():
     return "Hello, World!"
 
 #
-# if __name__ == '__main__':
-#     app.run(host='127.0.0.1', port=8800)
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=8800)
